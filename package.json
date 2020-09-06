@@ -4,11 +4,16 @@
   "private": true,
   "dependencies": {
     "axios": "^0.20.0",
+    "mic-recorder": "^4.9.0",
     "mic-recorder-to-mp3": "^2.2.1",
     "react": "^16.8.6",
+    "react-data-table-component": "^6.11.3",
     "react-dom": "^16.8.6",
     "react-dropzone": "^11.0.3",
+    "react-modal": "^3.11.2",
     "react-scripts": "3.0.1",
+    "reactstrap": "^8.5.1",
+    "styled-components": "^5.2.0",
     "watson-react-components": "^0.6.19"
   },
   "scripts": {

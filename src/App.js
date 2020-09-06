@@ -1,12 +1,45 @@
 import React from 'react';
 import './App.css';
-import MicRecorder from 'mic-recorder-to-mp3';
 import Dropzone from 'react-dropzone';
 import { Icon } from 'watson-react-components';
 import axios from 'axios';
-import * as env from './constants'
+import * as env from './constants';
+import ReactModal from 'react-modal';
+import DataTable from 'react-data-table-component';
+const MicRecorder = require('mic-recorder').default;
 
-const Mp3Recorder = new MicRecorder({ bitRate: 128 });
+
+const recorder = new MicRecorder({
+  bitRate: 128,
+  encoder: 'wav', // default is mp3, can be wav as well
+  sampleRate: 44100, // default is 44100, it can also be set to 16000 and 8000.
+});
+
+const customStyles = {
+  cells: {
+    style: {
+      paddingTop: '10px',
+      paddingBottom: '10px',
+    },
+  },
+};
+
+const recommended =[
+{"file":"Audio 1"},
+{"file":"Audio 2"},
+{"file":"Audio 3"},
+{"file":"Audio 4"},
+{"file":"Audio 5"}];
+
+const columns = [
+  {
+    name: 'Audio File',
+    selector: 'file',
+    sortable: false,
+    wrap: true,
+    center: true
+  },
+];
 
 class App extends React.Component {
   constructor(props){
@@ -19,25 +52,35 @@ class App extends React.Component {
       azureText: '',
       deepText: '',
       ibmText: '',
-      houndifyText: ''
+      houndifyText: '',
+      showModal: false,
+      allData:recommended
     };
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
+  handleOpenModal () {
+    this.setState({ showModal: true });
+  }
   
+  handleCloseModal () {
+    this.setState({ showModal: false });
+  }
 
   record = () => {
     if(!this.state.isRecording){
       this.reset();
-      Mp3Recorder.start().then(() => {
+      recorder.start().then(() => {
         this.setState({ isRecording: true });
       }).catch((e) => {
         console.error(e);
       });
     }
     else{
-      Mp3Recorder
+      recorder
       .stop()
-      .getMp3()
+      .getAudio()
       .then(([buffer, blob]) => {
         this.getBase64(blob);
         const blobURL = URL.createObjectURL(blob)
@@ -58,19 +101,24 @@ class App extends React.Component {
     })
   }
 
+
   getBase64(file) {
     var reader = new FileReader();
     reader.readAsDataURL(file);
+    var self = this;
     reader.onload = function () {
       console.log(reader.result);
       const formData = new FormData();
-      formData.append('file', reader.result)
-      this.uploadRecording('google',formData);
-      this.uploadRecording('sphinx',formData);
-      this.uploadRecording('azure',formData);
-      this.uploadRecording('deepspeech',formData);
-      this.uploadRecording('ibm',formData);
-      this.uploadRecording('houndify',formData);
+      formData.append('file', reader.result);
+      self.uploadRecording('google', formData)
+      setTimeout(function(){
+        self.uploadRecording('google',formData);
+        self.uploadRecording('sphinx',formData);
+        self.uploadRecording('azure',formData);
+        self.uploadRecording('deepspeech',formData);
+        self.uploadRecording('ibm',formData);
+        self.uploadRecording('houndify',formData);
+      },1000)
 
 
     };
@@ -91,6 +139,7 @@ class App extends React.Component {
   }
 
   uploadRecording(serviceName,formData){
+    var self = this;
     axios({
       method: 'post',
       url: env.url + serviceName,
@@ -102,22 +151,22 @@ class App extends React.Component {
           console.log(response);
           switch(serviceName) {
             case 'google':
-              this.setState({ googleText : response.data})
+              self.setState({ googleText : response.data.data})
               break;
             case 'sphinx':
-              this.setState({ spinxText : response.data})
+              self.setState({ spinxText : response.data.data})
               break;
             case 'azure':
-              this.setState({ azureText : response.data})
+              self.setState({ azureText : response.data.data})
               break;
             case 'deepspeech':
-              this.setState({ deepText : response.data})
+              self.setState({ deepText : response.data.data})
               break;
             case 'ibm':
-              this.setState({ ibmText : response.data})
+              self.setState({ ibmText : response.data.data})
               break;
             case 'houndify':
-              this.setState({ houndifyText : response.data})
+              self.setState({ houndifyText : response.data.data})
               break;
             default:
               console.log('default');
@@ -130,13 +179,14 @@ class App extends React.Component {
 
   }
 
+
   render(){
     return (
       <div className="App">
         <div className="headerPane">
-          <Icon style={{height:'40px'}} type='play' fill='#FFFFFF' /><span className="headerSpan">Speech Recognizer</span>
+          <Icon style={{height:'40px'}} type='play' fill='#FFFFFF' /><span className="headerSpan">Transcriber</span>
           <span style={{float:'right',marginRight:'50px',color:'white',fontSize:'20px',position:'relative',top:'6px'}}><span style={{marginRight:'30px',color:'#ef6c00'}}>Home</span>
-          <span>About</span></span>
+          <span className="searchLabel" onClick={this.handleOpenModal}>Search</span></span>
         </div>
 
         <div className="flexBox">
@@ -160,17 +210,17 @@ class App extends React.Component {
 
         <div className="textPanel">
           <div className="flexCard">
-            <div className="section">Google</div>
+            <div className="section">Google Speech Rcognition</div>
             <div className="message">{this.state.googleText}</div>
           </div>
 
           <div className="flexCard">
-            <div className="section">Sphinx</div>
+            <div className="section">PocketSphinx</div>
             <div className="message">{this.state.spinxText}</div>
           </div>
 
           <div className="flexCard">
-            <div className="section">Azure</div>
+            <div className="section">Microsoft Azure Speech</div>
             <div className="message">{this.state.azureText}</div>
           </div>
         </div>
@@ -191,9 +241,40 @@ class App extends React.Component {
             <div className="message">{this.state.houndifyText}</div>
           </div>
         </div>
+
+        <ReactModal 
+           isOpen={this.state.showModal}
+           contentLabel="Minimal Modal Example"
+           onRequestClose={this.handleCloseModal}
+        >
+          <div className="modalHeader">Search Audio</div>
+          <div className="modalContent">
+            <div><input type="text" className="searchInput"/></div>
+            <div className="searchButtonDiv"><button className="searchButton"><Icon type='search' fill='#FFFFFF' style={{height:'20px'}} /></button></div>
+
+          </div>
+          {/* <button onClick={this.handleCloseModal}>Close Modal</button> */}
+          <div style={{padding: '10px 150px'}}>
+                  <DataTable
+                            columns={columns}
+                            center
+                            data={this.state.allData}
+                            defaultSortField="title"
+                            pagination={true}
+                            highlightOnHover={true}
+                            striped={true}
+                            pointerOnHover={true}
+                            dense={true}
+                            fixedHeader={true}
+                            allowOverflow={false}
+                            customStyles={customStyles}
+                        />
+                        </div>
+        </ReactModal>
           
           
           {/* <audio src={this.state.blobURL} controls="controls" /> */}
+
       </div>
     );
   }
