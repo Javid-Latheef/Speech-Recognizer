@@ -15,6 +15,10 @@ body {
   color: white;
 }
 
+.searchLabel{
+  cursor: pointer;
+}
+
 .flexBox{
   display: flex;
   justify-content: space-evenly;
@@ -108,6 +112,70 @@ body {
 .flexCard{
   flex: 1;
   margin: 0px 30px;
+}
+
+.ReactModal__Overlay.ReactModal__Overlay--after-open {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+.ReactModal__Content.ReactModal__Content--after-open {
+  background: white !important;
+  width: 80% !important;
+  height: auto !important;
+  top:50% !important;
+  left:50% !important;
+  transform: translate(-50%,-50%) !important;
+}
+
+.rdt_TableCol{
+  font-size: 20px !important;
+}
+
+.rdt_TableHeader{
+  display: none !important;
+}
+
+.modalHeader{
+  text-align: center;
+  font-size: 24px;
+  color: #ef6c00;
+}
+
+.searchButton{
+  background: #ef6c00;
+  border: 0px;
+  height: 31px;
+  cursor: pointer;
+}
+
+.searchButton:focus{
+  outline: none;
+}
+
+.searchButton:focus{
+  outline: none;
+}
+
+.searchInput:focus{
+  outline: none;
+}
+
+.searchInput{
+    width: 200px;
+    height: 25px;
+    margin: 10px;
+    text-indent: 3px;
+}
+
+.modalContent{
+  display: flex;
+  justify-content: center;
+}
+
+.searchButtonDiv{
+    position: relative;
+    top: 10px;
+    left: -11px;
 }
 
 @keyframes App-logo-spin {
