@@ -25,16 +25,16 @@ const customStyles = {
 };
 
 const recommended =[
-{"file":"Audio 1"},
-{"file":"Audio 2"},
-{"file":"Audio 3"},
-{"file":"Audio 4"},
-{"file":"Audio 5"}];
+{"fileName":"Audio 1"},
+{"fileName":"Audio 2"},
+{"fileName":"Audio 3"},
+{"fileName":"Audio 4"},
+{"fileName":"Audio 5"}];
 
 const columns = [
   {
     name: 'Audio File',
-    selector: 'file',
+    selector: 'fileName',
     sortable: false,
     wrap: true,
     center: true
@@ -54,10 +54,15 @@ class App extends React.Component {
       ibmText: '',
       houndifyText: '',
       showModal: false,
+      searchText:'',
       allData:recommended
     };
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
+  }
+
+  componentDidMount(){
+    this.getFiles("");
   }
 
   handleOpenModal () {
@@ -179,6 +184,48 @@ class App extends React.Component {
 
   }
 
+  getFiles(string){
+    var self = this;
+    if(string === "") {
+      axios({
+        method: 'GET',
+        url: env.url,
+        headers: {'Content-Type': 'application/json' }
+        })
+        .then(function (response) {
+            //handle success
+            console.log(response);
+            self.setState({allData:response.data.data})
+        })
+        .catch(function (response) {
+            //handle error
+            console.log(response);
+        });
+    } else {
+        axios({
+          method: 'GET',
+          url: env.url,
+          headers: {'Content-Type': 'application/json' }
+          })
+          .then(function (response) {
+              //handle success
+              console.log(response);
+              self.setState({allData:response.data.data})
+          })
+          .catch(function (response) {
+              //handle error
+              console.log(response);
+          });
+    }
+  }
+
+  searchButtonClick(){
+    console.log(this.state.searchText);
+    if(this.state.searchText.trim() === ""){
+      
+    }
+  }
+
 
   render(){
     return (
@@ -249,8 +296,8 @@ class App extends React.Component {
         >
           <div className="modalHeader">Search Audio</div>
           <div className="modalContent">
-            <div><input type="text" className="searchInput"/></div>
-            <div className="searchButtonDiv"><button className="searchButton"><Icon type='search' fill='#FFFFFF' style={{height:'20px'}} /></button></div>
+            <div><input type="text" className="searchInput" onChange={(e) => this.setState({searchText : e.target.value})} /></div>
+            <div className="searchButtonDiv"><button className="searchButton" onClick={() => this.searchButtonClick()}><Icon type='search' fill='#FFFFFF' style={{height:'20px'}} /></button></div>
 
           </div>
           {/* <button onClick={this.handleCloseModal}>Close Modal</button> */}
