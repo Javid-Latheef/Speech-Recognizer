@@ -23,8 +23,9 @@ class App extends React.Component {
     };
   }
 
+  
+
   record = () => {
-    console.log(env.url)
     if(!this.state.isRecording){
       this.reset();
       Mp3Recorder.start().then(() => {
@@ -38,6 +39,7 @@ class App extends React.Component {
       .stop()
       .getMp3()
       .then(([buffer, blob]) => {
+        this.getBase64(blob);
         const blobURL = URL.createObjectURL(blob)
         this.setState({ blobURL, isRecording: false });
       }).catch((e) => console.log(e));
@@ -56,6 +58,27 @@ class App extends React.Component {
     })
   }
 
+  getBase64(file) {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      console.log(reader.result);
+      const formData = new FormData();
+      formData.append('file', reader.result)
+      this.uploadRecording('google',formData);
+      this.uploadRecording('sphinx',formData);
+      this.uploadRecording('azure',formData);
+      this.uploadRecording('deepspeech',formData);
+      this.uploadRecording('ibm',formData);
+      this.uploadRecording('houndify',formData);
+
+
+    };
+    reader.onerror = function (error) {
+      console.log('Error: ', error);
+    };
+ }
+
 
 
   onDrop = (files) => {
@@ -64,6 +87,7 @@ class App extends React.Component {
     if (!file) {
       return;
     }
+    this.getBase64(file);
   }
 
   uploadRecording(serviceName,formData){
@@ -76,6 +100,28 @@ class App extends React.Component {
       .then(function (response) {
           //handle success
           console.log(response);
+          switch(serviceName) {
+            case 'google':
+              this.setState({ googleText : response.data})
+              break;
+            case 'sphinx':
+              this.setState({ spinxText : response.data})
+              break;
+            case 'azure':
+              this.setState({ azureText : response.data})
+              break;
+            case 'deepspeech':
+              this.setState({ deepText : response.data})
+              break;
+            case 'ibm':
+              this.setState({ ibmText : response.data})
+              break;
+            case 'houndify':
+              this.setState({ houndifyText : response.data})
+              break;
+            default:
+              console.log('default');
+          }
       })
       .catch(function (response) {
           //handle error
