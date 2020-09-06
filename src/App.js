@@ -110,7 +110,7 @@ class App extends React.Component {
       console.log(reader.result);
       const formData = new FormData();
       formData.append('file', reader.result);
-      self.uploadRecording('google', formData)
+      self.uploadRecording('upload', formData)
       setTimeout(function(){
         self.uploadRecording('google',formData);
         self.uploadRecording('sphinx',formData);
