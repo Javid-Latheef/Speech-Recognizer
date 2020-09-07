@@ -152,8 +152,8 @@ body {
   outline: none;
 }
 
-.searchButton:focus{
-  outline: none;
+.searchButton:hover{
+  opacity: 0.7;
 }
 
 .searchInput:focus{

@@ -6,6 +6,7 @@ import axios from 'axios';
 import * as env from './constants';
 import ReactModal from 'react-modal';
 import DataTable from 'react-data-table-component';
+// import sample from './audio/sample.wav';
 const MicRecorder = require('mic-recorder').default;
 
 
@@ -36,6 +37,7 @@ const columns = [
     name: 'Audio File',
     selector: 'fileName',
     sortable: false,
+    cell: row => <a href={row.fileName} target="_blank" style={{color:'orange'}}download>{row.fileName}</a>,
     wrap: true,
     center: true
   },
@@ -222,12 +224,23 @@ class App extends React.Component {
   searchButtonClick(){
     console.log(this.state.searchText);
     if(this.state.searchText.trim() === ""){
-      
+      this.getFiles("");
+    }
+    else{
+      this.getFiles(this.state.searchText.trim());
+    }
+  }
+
+  searchInputChange(event){
+    this.setState({searchText : event.target.value});
+    if(event.target.value.trim() === ""){
+      this.getFiles("");
     }
   }
 
 
   render(){
+
     return (
       <div className="App">
         <div className="headerPane">
@@ -296,11 +309,10 @@ class App extends React.Component {
         >
           <div className="modalHeader">Search Audio</div>
           <div className="modalContent">
-            <div><input type="text" className="searchInput" onChange={(e) => this.setState({searchText : e.target.value})} /></div>
+            <div><input type="text" className="searchInput" onChange={(e) => this.searchInputChange(e)} /></div>
             <div className="searchButtonDiv"><button className="searchButton" onClick={() => this.searchButtonClick()}><Icon type='search' fill='#FFFFFF' style={{height:'20px'}} /></button></div>
 
           </div>
-          {/* <button onClick={this.handleCloseModal}>Close Modal</button> */}
           <div style={{padding: '10px 150px'}}>
                   <DataTable
                             columns={columns}
@@ -318,9 +330,9 @@ class App extends React.Component {
                         />
                         </div>
         </ReactModal>
-          
-          
-          {/* <audio src={this.state.blobURL} controls="controls" /> */}
+        
+        {/* <a href={sample} target="_blank" download>Click to download</a>
+        <audio src={sample} controls></audio> */}
 
       </div>
     );
