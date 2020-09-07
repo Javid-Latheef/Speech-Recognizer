@@ -9,7 +9,6 @@ import DataTable from 'react-data-table-component';
 // import sample from './audio/sample.wav';
 const MicRecorder = require('mic-recorder').default;
 
-
 const recorder = new MicRecorder({
   bitRate: 128,
   encoder: 'wav', // default is mp3, can be wav as well
@@ -24,6 +23,7 @@ const customStyles = {
     },
   },
 };
+
 
 const recommended =[
 {"file":"Audio 1"},
@@ -57,7 +57,8 @@ class App extends React.Component {
       houndifyText: '',
       showModal: false,
       searchText:'',
-      allData:recommended
+      allData:recommended,
+      jsonObj : ''
     };
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -104,7 +105,8 @@ class App extends React.Component {
       azureText: '',
       deepText: '',
       ibmText: '',
-      houndifyText: ''
+      houndifyText: '',
+      jsonObj : ''
     })
   }
 
@@ -158,26 +160,42 @@ class App extends React.Component {
           console.log(response);
           switch(serviceName) {
             case 'google':
-              self.setState({ googleText : response.data.data})
+              self.setState({ googleText : response.data.input})
               break;
             case 'sphinx':
-              self.setState({ spinxText : response.data.data})
+              self.setState({ spinxText : response.data.input})
               break;
             case 'azure':
-              self.setState({ azureText : response.data.data})
+              self.setState({ azureText : response.data.input})
               break;
             case 'deepspeech':
-              self.setState({ deepText : response.data.data})
+              self.setState({ deepText : response.data.input})
+              axios({
+                method: 'post',
+                url: env.nlpURL + 'nlp',
+                data: response.data,
+                headers: {'Content-Type': 'application/json' }
+                })
+                .then(function (resp) {
+                  //handle success
+                  console.log(resp);
+                  self.setState({jsonObj:JSON.stringify(resp.data)})
+                })
+                .catch(function (resp) {
+                    //handle error
+                    console.log(resp);
+                });
               break;
             case 'ibm':
-              self.setState({ ibmText : response.data.data})
+              self.setState({ ibmText : response.data.input})
               break;
             case 'houndify':
-              self.setState({ houndifyText : response.data.data})
+              self.setState({ houndifyText : response.data.input})
               break;
             default:
               console.log('default');
           }
+
       })
       .catch(function (response) {
           //handle error
@@ -245,8 +263,10 @@ class App extends React.Component {
       <div className="App">
         <div className="headerPane">
           <Icon style={{height:'40px'}} type='play' fill='#FFFFFF' /><span className="headerSpan">Transcriber</span>
-          <span style={{float:'right',marginRight:'50px',color:'white',fontSize:'20px',position:'relative',top:'6px'}}><span style={{marginRight:'30px',color:'#ef6c00'}}>Home</span>
-          <span className="searchLabel" onClick={this.handleOpenModal}>Search</span></span>
+          <div style={{display:'flex',float:'right',marginRight:'50px',color:'white',fontSize:'20px',position:'relative',top:'6px'}}>
+            <span style={{marginRight:'30px',color:'#ef6c00'}}>Home</span>
+            <span className="searchLabel" onClick={this.handleOpenModal}>Search</span>
+            </div>
         </div>
 
         <div className="flexBox">
@@ -285,7 +305,7 @@ class App extends React.Component {
           </div>
         </div>
 
-        <div className="textPanel" style={{marginBottom:'20px'}}>
+        <div className="textPanel">
           <div className="flexCard">
             <div className="section">Deep Speech</div>
             <div className="message">{this.state.deepText}</div>
@@ -299,6 +319,13 @@ class App extends React.Component {
           <div className="flexCard">
             <div className="section">Houndify</div>
             <div className="message">{this.state.houndifyText}</div>
+          </div>
+        </div>
+
+        <div className="textPanel" style={{marginBottom:'20px'}}>
+        <div className="flexCard" style={{flex:'0.5'}}> 
+            <div className="section">NLP Correction</div>
+            <div className="message">{this.state.jsonObj}</div>
           </div>
         </div>
 
