@@ -26,18 +26,18 @@ const customStyles = {
 };
 
 const recommended =[
-{"fileName":"Audio 1"},
-{"fileName":"Audio 2"},
-{"fileName":"Audio 3"},
-{"fileName":"Audio 4"},
-{"fileName":"Audio 5"}];
+{"file":"Audio 1"},
+{"file":"Audio 2"},
+{"file":"Audio 3"},
+{"file":"Audio 4"},
+{"file":"Audio 5"}];
 
 const columns = [
   {
     name: 'Audio File',
-    selector: 'fileName',
+    selector: 'file',
     sortable: false,
-    cell: row => <a href={row.fileName} target="_blank" style={{color:'orange'}}download>{row.fileName}</a>,
+    cell: row => <a href={row.file} target="_blank" style={{color:'orange'}}download>{row.file}</a>,
     wrap: true,
     center: true
   },
@@ -191,7 +191,7 @@ class App extends React.Component {
     if(string === "") {
       axios({
         method: 'GET',
-        url: env.url,
+        url: env.nlpURL + "nlpquery?query=",
         headers: {'Content-Type': 'application/json' }
         })
         .then(function (response) {
@@ -206,7 +206,7 @@ class App extends React.Component {
     } else {
         axios({
           method: 'GET',
-          url: env.url,
+          url: env.nlpURL + "nlpquery?query=" + string,
           headers: {'Content-Type': 'application/json' }
           })
           .then(function (response) {
