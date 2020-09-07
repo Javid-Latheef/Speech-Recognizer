@@ -270,7 +270,7 @@ class App extends React.Component {
 
         <div className="textPanel">
           <div className="flexCard">
-            <div className="section">Google Speech Rcognition</div>
+            <div className="section">Google Speech Recognition</div>
             <div className="message">{this.state.googleText}</div>
           </div>
 
